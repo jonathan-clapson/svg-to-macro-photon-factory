@@ -72,14 +72,15 @@ void process_cmd_opts(int argc, char *argv[])
 }
 
 /**
- * Gets a node from the svg namespace using xpath
+ * Gets a node from a namespace using xpath
  *
  * @param[in]	doc the xml document to get nodes from
  * @param[in]	xpath the xpath to match
+ * @param[in]	ns the namespace to look in
  * 
  * @return returns a list of nodes which match xpath in xmlXPathObject format
  */
-xmlXPathObjectPtr get_node_set (xmlDocPtr doc, xmlChar *xpath){
+xmlXPathObjectPtr get_node_set (xmlDocPtr doc, xmlChar *xpath, xmlChar *ns){
 	
 	xmlXPathContextPtr context;
 	xmlXPathObjectPtr result;
@@ -88,7 +89,7 @@ xmlXPathObjectPtr get_node_set (xmlDocPtr doc, xmlChar *xpath){
 	context = xmlXPathNewContext(doc);
 	printf("checking %s\n", xpath);
 	
-	xmlXPathRegisterNs(context,  BAD_CAST "svg", BAD_CAST "http://www.w3.org/2000/svg");
+	xmlXPathRegisterNs(context,  BAD_CAST "svg", BAD_CAST ns);
 	
 	result = xmlXPathEvalExpression(xpath, context);
 	if(xmlXPathNodeSetIsEmpty(result->nodesetval)){
@@ -130,11 +131,17 @@ int xml_get_int_param(xmlNodePtr node, xmlChar *property_name)
 	return value;
 }
 
-
+/**
+ * Gets a list of layer nodes using xpath
+ *
+ * @param[in]	doc the xml document to get nodes from
+ * 
+ * @return returns a list of nodes which match xpath in xmlXPathObject format
+ */
 xmlXPathObjectPtr get_layers(xmlDocPtr doc){
 	/* select all children of root node which have a title */
 	//return get_node_set(doc, (xmlChar *)"/svg:svg/svg:g");
-	return get_node_set(doc, (xmlChar *)"/svg:svg/svg:g");
+	return get_node_set(doc, (xmlChar *)"/svg:svg/svg:g", (xmlChar *)"http://www.w3.org/2000/svg");
 }
 
 int process_line(xmlNodePtr line_node){
