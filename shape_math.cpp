@@ -3,11 +3,11 @@
 #include "shape_math.h"
 
 void cubic_bezier_get_x_y(
-	struct point_t &result, 
-	struct point_t start,
-	struct point_t inter1,
-	struct point_t inter2, 
-	struct point_t end,
+	point_t &result, 
+	point_t start,
+	point_t inter1,
+	point_t inter2, 
+	point_t end,
 	double t)
 {
 	/* 
@@ -25,3 +25,13 @@ void cubic_bezier_get_x_y(
 	 result.x = start.x * b1 + inter1.x * b2 + inter2.x * b3 + end.x * b4;
 	 result.y = start.y * b1 + inter1.y * b2 + inter2.y * b3 + end.y * b4;
 }
+
+void ellipse_get_x_y(
+	point_t &result,
+	point_t center,
+	length_t radii,
+	double t)
+{
+	
+}
+	

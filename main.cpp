@@ -15,11 +15,13 @@
 #include "shape_math.h"
 
 /* need to do these
- * Circle <circle>
- * Ellipse <ellipse>
+ * Line <line> -ish
+ * Rectangle <rectangle> -ish
+ * Circle <circle> -ish
+ * Ellipse <ellipse> -ish
  * Polyline <polyline>
  * Polygon <polygon>
- * Path <path>
+ * Path <path> -sh
  */
  
 using namespace std;
@@ -173,6 +175,40 @@ int process_line(xmlNodePtr node){
 	return 0;
 }
 
+int process_ellipse(xmlNodePtr node){
+	point_t start_point = {0.0, 0.0}; /* keeps track of the point to close to - this should probably be a list I think you can do subpaths within subpaths? :S */
+	point_t current_point = {0.0, 0.0}, last_point = {0.0, 0.0};
+	
+	double fill = 0;
+	point_t center, radii;
+	
+	
+	xmlChar *id = xmlGetProp(node, (xmlChar*)"id");
+	macro_writer_comment("ELLIPSE: %s", id);
+	printf("processing ellipse %s\n", id);
+	
+	center.x = 	xml_get_double_param(node, (xmlChar*)"cx");	
+	center.y = 	xml_get_double_param(node, (xmlChar*)"cy");	
+	radii.x = 	xml_get_double_param(node, (xmlChar*)"rx");	
+	radii.y = 	xml_get_double_param(node, (xmlChar*)"ry");	
+	fill = 	xml_get_double_param(node, (xmlChar*)"fill");
+	
+	/* fit line segments to ellipse */				
+	for (double t = 0.00; t <= 1.00; t+=0.01) {		
+		/* get a new point along ellipse */
+		ellipse_get_x_y(current_point, center, radii, t);
+		
+		macro_writer_write_line(last_point.x, last_point.y, current_point.x, current_point.y);
+		
+		/* update position along bezier curve */
+		memcpy(&last_point, &current_point, sizeof(last_point));
+	}		
+	
+	xmlFree(id);
+	return 0;
+}
+	
+	
 int process_rect(xmlNodePtr node){
 	double fill = 0;
 	/* svg rectangle representation */
@@ -278,10 +314,10 @@ int path_get_double(char *path, double &d_val)
 
 int process_path(xmlNodePtr node){
 	/* position tracking */
-	struct point_t start_point = {0.0, 0.0}; /* keeps track of the point to close to - this should probably be a list I think you can do subpaths within subpaths? :S */
-	struct point_t current_point = {0.0, 0.0}, last_point = {0.0, 0.0};
+	point_t start_point = {0.0, 0.0}; /* keeps track of the point to close to - this should probably be a list I think you can do subpaths within subpaths? :S */
+	point_t current_point = {0.0, 0.0}, last_point = {0.0, 0.0};
 	/* bezier variables */
-	struct point_t bez_start, bez_inter1, bez_inter2, bez_end;
+	point_t bez_start, bez_inter1, bez_inter2, bez_end;
 	
 	/* used to store line start and end points */
 	double x1_line, y1_line, x2_line, y2_line; 
@@ -436,8 +472,13 @@ int main (int argc, char *argv[])
 					process_rect(g_child);
 				else if (xmlStrcmp(g_child->name, (xmlChar *)"circle") == 0)
 					process_circle(g_child);
+				else if (xmlStrcmp(g_child->name, (xmlChar *)"ellipse") == 0)
+					process_ellipse(g_child);
 				else if (xmlStrcmp(g_child->name, (xmlChar *)"path") == 0)
 					process_path(g_child);
+				else
+					fprintf(stderr, "Unknown element %s\n", g_child->name);
+				
 				
 				
 				g_child = g_child->next;
