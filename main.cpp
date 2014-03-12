@@ -476,6 +476,8 @@ int main (int argc, char *argv[])
 					process_ellipse(g_child);
 				else if (xmlStrcmp(g_child->name, (xmlChar *)"path") == 0)
 					process_path(g_child);
+				else if (xmlStrcmp(g_child->name, (xmlChar *)"text") == 0) /* not actually sure what all of these are */
+					NULL;
 				else
 					fprintf(stderr, "Unknown element %s\n", g_child->name);
 				
