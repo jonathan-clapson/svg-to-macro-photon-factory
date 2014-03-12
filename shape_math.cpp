@@ -32,6 +32,7 @@ void ellipse_get_x_y(
 	length_t radii,
 	double t)
 {
-	
+	result.x = center.x + radii.x * cos(t);
+	result.y = center.y + radii.y * sin(t);	
 }
 	
