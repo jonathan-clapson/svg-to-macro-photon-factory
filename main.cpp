@@ -151,6 +151,14 @@ xmlXPathObjectPtr get_layers(xmlDocPtr doc){
 	return get_node_set(doc, (xmlChar *)"/svg:svg/svg:g", (xmlChar *)"http://www.w3.org/2000/svg");
 }
 
+
+/**
+ * Examines an svg line node. Converts data to macro format and writes
+ *
+ * @param[in]	node the node to retrieve a property from
+ * 
+ * @return returns 0
+ */
 int process_line(xmlNodePtr node){
 	double fill = 0;
 	double x1,y1,x2,y2;	
@@ -175,6 +183,13 @@ int process_line(xmlNodePtr node){
 	return 0;
 }
 
+/**
+ * Examines an svg ellipse node. Converts data to macro format and writes
+ *
+ * @param[in]	node the node to retrieve a property from
+ * 
+ * @return returns 0
+ */
 int process_ellipse(xmlNodePtr node){
 	point_t start_point = {0.0, 0.0}; /* keeps track of the point to close to - this should probably be a list I think you can do subpaths within subpaths? :S */
 	point_t current_point = {0.0, 0.0}, last_point = {0.0, 0.0};
@@ -208,7 +223,13 @@ int process_ellipse(xmlNodePtr node){
 	return 0;
 }
 	
-	
+/**
+ * Examines an svg rectangle node. Converts data to macro format and writes
+ *
+ * @param[in]	node the node to retrieve a property from
+ * 
+ * @return returns 0
+ */	
 int process_rect(xmlNodePtr node){
 	double fill = 0;
 	/* svg rectangle representation */
@@ -261,6 +282,13 @@ int process_rect(xmlNodePtr node){
 	return 0;
 }
 
+/**
+ * Examines an svg circle node. Converts data to macro format and writes
+ *
+ * @param[in]	node the node to retrieve a property from
+ * 
+ * @return returns 0
+ */
 int process_circle(xmlNodePtr node){
 	double radius;
 	double y;
@@ -312,6 +340,13 @@ int path_get_double(char *path, double &d_val)
 	return i;
 }
 
+/**
+ * Examines an svg path node. Converts data to macro format and writes
+ *
+ * @param[in]	node the node to retrieve a property from
+ * 
+ * @return returns 0
+ */
 int process_path(xmlNodePtr node){
 	/* position tracking */
 	point_t start_point = {0.0, 0.0}; /* keeps track of the point to close to - this should probably be a list I think you can do subpaths within subpaths? :S */
