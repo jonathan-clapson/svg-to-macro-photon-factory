@@ -16,7 +16,7 @@
 
 /* need to do these
  * Line <line> -ish
- * Rectangle <rectangle> -ish
+ * Rectangle <rect> -ish
  * Circle <circle> -ish
  * Ellipse <ellipse> -ish
  * Polyline <polyline>
@@ -298,7 +298,7 @@ int path_get_double(char *path, double &d_val)
 	string value("");
 	
 	/* skip to command */
-	//while(*path == ' ' || *path == ',');
+	while(*path == ' ' || *path == ',');
 	
 	for (i=0; path[i] == '.' || path[i] == '-' || (path[i] >= '0' && path[i] <= '9'); i++) {
 			value += path[i];
@@ -459,7 +459,6 @@ int main (int argc, char *argv[])
 		nodeset = layers->nodesetval;
 		for (int i=0; i < nodeset->nodeNr; i++) {
 			printf("g%d\n", i);
-			//xmlChar *keyword = xmlNodeListGetString(doc, nodeset->nodeTab[i]->name, 1);
 			xmlNodePtr g_node = nodeset->nodeTab[i];
 			xmlNodePtr g_child = g_node->xmlChildrenNode;
 			
@@ -480,8 +479,6 @@ int main (int argc, char *argv[])
 					NULL;
 				else
 					fprintf(stderr, "Unknown element %s\n", g_child->name);
-				
-				
 				
 				g_child = g_child->next;
 			}
