@@ -14,6 +14,15 @@ int macro_writer_init(const char *file_name)
 	return 0;
 }
 
+int macro_writer_move_to(int x, int y)
+{
+	if (!fp)
+		return (-1);
+		
+	fprintf(fp, "move\n");
+	return 0;
+}
+
 int macro_writer_write_line(int x0, int y0, int x1, int y1)
 {
 	if (!fp)
