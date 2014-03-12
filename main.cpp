@@ -27,7 +27,7 @@
 using namespace std;
 
 /* switch default output name to be default input with mac extension */
-char out_file[255] = "output.mac"; /* output file name - default is output-mac */
+char out_file[255] = ""; /* output file name - default is output-mac */
 char in_file[255] = ""; /* input file name */
 FILE *out_fp; /* output file pointer */
 
@@ -417,6 +417,10 @@ int main (int argc, char *argv[])
 	
 	process_cmd_opts(argc, argv);
 	
+	/* if outfile hasn't been given a name, set it to infile.mac */
+	if (*out_file == '\0')
+		sprintf(out_file, "%s.mac", in_file);
+		
 	printf("Using output file %s\n", out_file);
 	printf("Using input file %s\n", in_file);
 	
