@@ -19,9 +19,9 @@
  * Rectangle <rect> -ish
  * Circle <circle> -ish
  * Ellipse <ellipse> -ish
- * Polyline <polyline>
- * Polygon <polygon>
- * Path <path> -sh
+ * Polyline <polyline> -not used?
+ * Polygon <polygon> -not used?
+ * Path <path> -ish
  */
  
 using namespace std;
