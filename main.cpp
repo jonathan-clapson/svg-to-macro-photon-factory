@@ -157,6 +157,7 @@ int process_line(xmlNodePtr node){
 	
 	/* retrieve and convert data */
 	xmlChar *id = xmlGetProp(node, (xmlChar*)"id");
+	macro_writer_comment("LINE: %s", id);
 	printf("processing line %s\n", id);
 	
 	x1 = 	xml_get_double_param(node, (xmlChar*)"x1");	
@@ -184,7 +185,8 @@ int process_rect(xmlNodePtr node){
 	
 	/* retrieve and convert data */
 	xmlChar *id = xmlGetProp(node, (xmlChar*)"id");
-	printf("processing line %s\n", id);
+	macro_writer_comment("RECT: %s", id);
+	printf("processing rect %s\n", id);
 	
 	width = xml_get_double_param(node, (xmlChar*)"width");
 	height = xml_get_double_param(node, (xmlChar*)"height");
@@ -230,6 +232,7 @@ int process_circle(xmlNodePtr node){
 	double fill;
 	
 	xmlChar *id = xmlGetProp(node, (xmlChar*)"id");
+	macro_writer_comment("CIRCLE: %s", id);
 	printf("processing circle %s\n", id);	
 	
 	//<circle id="svg_1" r="203.21663" cy="240" cx="300" stroke-opacity="null" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="5" stroke="#000000" fill="#FFFFFF"/>
@@ -287,6 +290,7 @@ int process_path(xmlNodePtr node){
 	xmlChar *id = xmlGetProp(node, (xmlChar*)"id");
 	char *path_string = (char *) xmlGetProp(node, (xmlChar*)"d");
 	
+	macro_writer_comment("PATH: %s", id);
 	printf("processing path %s\n", id);
 		
 	/* process the path string */

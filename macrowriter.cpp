@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdarg.h>
 
 FILE *fp;
 char *name;
@@ -14,12 +15,23 @@ int macro_writer_init(const char *file_name)
 	return 0;
 }
 
+int macro_writer_comment(const char *format, ...) {
+	va_list args;
+    va_start( args, format );
+    fprintf(fp, "Comment;");
+    vfprintf(fp, format, args );
+    fprintf(fp, "\n");
+    va_end( args );
+	
+	return 0;
+}
+
 int macro_writer_move_to(int x, int y)
 {
 	if (!fp)
 		return (-1);
-		
-	fprintf(fp, "move\n");
+	fprintf(fp, "Line;500;1000000000;0;False;27500000;12500050;Disabled;10000;2\n");
+	
 	return 0;
 }
 
