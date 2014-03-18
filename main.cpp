@@ -19,7 +19,7 @@
  * Rectangle <rect> -ish
  * Circle <circle> -ish
  * Ellipse <ellipse> -ish
- * Polyline <polyline> -not used?
+ * Polyline <polyline> -needs to be done, used for connected items
  * Polygon <polygon> -not used?
  * Path <path> -ish
  */
