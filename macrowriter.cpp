@@ -211,6 +211,9 @@ int mw_arc_populate(struct m_arc_t &arc, long radius, double start_angle, double
 {
 	mw_arc_init(arc);
 	
+	strncpy(arc.x_mapping, m_axes_str[m_axes_x], M_BUF_LEN);
+	strncpy(arc.y_mapping, m_axes_str[m_axes_y], M_BUF_LEN);
+	
 	if (start_angle != 0.0) {
 		snprintf(arc.start_angle, M_BUF_LEN, "%f", start_angle);
 	}
