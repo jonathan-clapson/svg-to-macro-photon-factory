@@ -10,7 +10,7 @@ int mw_svgedit_helper_draw_line(int x0, int y0, int x1, int y1);
 int mw_svgedit_helper_draw_circle(long radius, long x, long y);
 
 int mw_line_init(struct m_line_t &line);
-int mw_line_populate(enum m_move_commands_t coord_type, struct m_line_t &line, long x_nm, long y_nm, unsigned laser_on);
+int mw_line_populate(enum m_commands_t coord_type, struct m_line_t &line, long x_nm, long y_nm, unsigned laser_on);
 int mw_line_exec(struct m_line_t line);
 
 int mw_arc_init(struct m_arc_t &arc);

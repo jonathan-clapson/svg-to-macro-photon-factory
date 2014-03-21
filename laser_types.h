@@ -36,10 +36,13 @@ extern const char m_axes_str [m_axes_num_axes][M_AXES_STR_LEN];
  * move_commands and move_commands_str are closely tied.
  * make sure your indexes line up if you need to adjust for some reason 
  */
-enum m_move_commands_t {
+enum m_commands_t {
+	m_command_invalid = -1,
 	m_relative = 0,
 	m_origin,
 	m_absolute,
+	m_arc,
+	m_comment,
 	m_num_move_commands
 };
 /* defined in laser_types.cpp */

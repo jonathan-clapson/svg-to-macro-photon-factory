@@ -388,7 +388,7 @@ int process_path(xmlNodePtr node){
 	point_t bez_start, bez_inter1, bez_inter2, bez_end;
 	
 	/* first command needs to be absolute, set it by default in case something strange happens */
-	enum m_move_commands_t move_type = m_absolute;
+	enum m_commands_t move_type = m_absolute;
 	
 	/* used to store line start and end points */
 	double x1_line, y1_line, x2_line, y2_line; 

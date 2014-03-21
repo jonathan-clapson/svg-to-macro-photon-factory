@@ -161,7 +161,7 @@ int mw_zero_counters_init(m_zero_t& zero)
  * 
  * @return returns 0 on success, -1 on file not open
  */
-int mw_line_populate(enum m_move_commands_t coord_type, struct m_line_t &line, long x_nm, long y_nm, unsigned laser_on)
+int mw_line_populate(enum m_commands_t coord_type, struct m_line_t &line, long x_nm, long y_nm, unsigned laser_on)
 {
 	if (!fp)
 		return M_ERR_FILE_NOT_OPEN;	

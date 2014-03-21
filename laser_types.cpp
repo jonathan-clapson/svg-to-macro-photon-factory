@@ -3,7 +3,9 @@
 const char m_move_commands_str [m_num_move_commands][M_BUF_LEN] = {
 	"RelMove",
 	"OriginMove",
-	"AbsMove"
+	"AbsMove",
+	"ArcMove",
+	"Comment"
 };
 
 const char m_axes_str [m_axes_num_axes][M_AXES_STR_LEN] = {	
