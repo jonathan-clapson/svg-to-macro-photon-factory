@@ -10,6 +10,8 @@ char *name;
 
 #define LINE_END "\r\n"
 
+/* FIXME: the following two helper functions shouldn't be doing coordinate converstion */
+
 /** 
  * helper function to be able to write lines in a more traditional line drawing format
  */
@@ -64,7 +66,7 @@ int mw_svgedit_helper_draw_circle(long radius, long x, long y)
 	double end_angle = 360;
 	
 	struct m_arc_t arc;
-	mw_arc_populate(arc, radius, start_angle, end_angle, M_LASER_ON);
+	mw_arc_populate(arc, radius*1000, start_angle, end_angle, M_LASER_ON);
 	mw_arc_exec(arc);
 	
 	return M_ERR_SUCCESS;
@@ -201,7 +203,7 @@ int mw_line_populate(enum m_move_commands_t coord_type, struct m_line_t &line, l
  * constructs an arc structure with parameters
  * 
  * @param[in] arc reference to an arc_t to initialise and fill in
- * @param[in] radius the radius of the arc
+ * @param[in] radius the radius of the arc in nano meters
  * @param[in] start_angle the angle to start the arc from (x axis = 0 degrees)
  * @param[in] end_angle the angle to end the arc at (x axis = 0 degrees)
  * 
