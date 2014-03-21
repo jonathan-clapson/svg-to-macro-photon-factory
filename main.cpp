@@ -207,39 +207,6 @@ int process_line(xmlNodePtr node){
 	return 0;
 }
 
-
-//int process_ellipse(xmlNodePtr node){
-	//point_t start_point = {0.0, 0.0}; /* keeps track of the point to close to - this should probably be a list I think you can do subpaths within subpaths? :S */
-	//point_t current_point = {0.0, 0.0}, last_point = {0.0, 0.0};
-	
-	//double fill = 0;
-	//point_t center, radii;
-	
-	
-	//xmlChar *id = xmlGetProp(node, (xmlChar*)"id");
-	//mw_comment("ELLIPSE: %s", id);
-	//printf("processing ellipse %s\n", id);
-	
-	//center.x = 	xml_get_double_param(node, (xmlChar*)"cx");	
-	//center.y = 	xml_get_double_param(node, (xmlChar*)"cy");	
-	//radii.x = 	xml_get_double_param(node, (xmlChar*)"rx");	
-	//radii.y = 	xml_get_double_param(node, (xmlChar*)"ry");	
-	//fill = 	xml_get_double_param(node, (xmlChar*)"fill");
-	
-	///* fit line segments to ellipse */				
-	//for (double t = 0.00; t <= 1.00; t+=0.01) {		
-		///* get a new point along ellipse */
-		//ellipse_get_x_y(current_point, center, radii, t);
-		
-		//mw_svgedit_helper_draw_line(last_point.x, last_point.y, current_point.x, current_point.y);
-		
-		///* update position along bezier curve */
-		//memcpy(&last_point, &current_point, sizeof(last_point));
-	//}		
-	
-	//xmlFree(id);
-	//return 0;
-//}
 /**
  * Examines an svg ellipse node. Converts data to macro format and writes
  *
