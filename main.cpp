@@ -281,7 +281,7 @@ int process_ellipse(xmlNodePtr node){
 		
 		shift_coordinate_file_to_macro(current_point);		
 		
-		mw_line_populate(m_relative, line, current_point.x, current_point.y, M_LASER_ON);
+		mw_line_populate(m_absolute, line, current_point.x, current_point.y, M_LASER_ON);
 		mw_line_exec(line);
 	}		
 	
