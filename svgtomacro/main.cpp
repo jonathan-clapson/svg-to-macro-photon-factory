@@ -242,7 +242,7 @@ int process_ellipse(xmlNodePtr node){
 	
 	/* fit line segments to ellipse */				
 	double step_size = 0.01;
-	for (double t = 0.00+step_size; t <= 1.00; t+=step_size) {		
+	for (double t = 0.00+step_size; t <= 2*3.14159; t+=step_size) {		
 		/* get a new point along ellipse */
 		ellipse_get_x_y(current_point, center, radii, t);
 		

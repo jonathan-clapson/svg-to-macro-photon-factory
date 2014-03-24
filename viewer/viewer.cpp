@@ -32,7 +32,7 @@ const double y_shift = screen_height/2;
  *  -6 = 1000 = um
  * const double nm_to_mm = 1000;
  */
-const double nm_to_minus4 = 1000000;
+const double nm_to_minus4 = 200000;
 /* -3 = 1000000 = mm 
  *const double nm_to_mm = 1000000;
  */
@@ -64,6 +64,12 @@ void get_screen_coords(double &screen_x, double &screen_y, double laser_x, doubl
 void scale_to_screen(double &screen_radius, double laser_radius)
 {
 	screen_radius = laser_radius/scale_factor;
+}
+
+void get_circle_point(double &xret, double &yret, double x_center, double y_center, double radius, double t_angle){
+	/* circle is parametrically defined as x=r*cos(t)+xcenter, y=r*sin(t)+ycenter 0<t<=2*pi */
+	xret = radius * cos(t_angle) + x_center;
+	yret = radius * sin(t_angle) + y_center;
 }
 
 int main(int argc, char *argv[]) {
@@ -195,11 +201,17 @@ int main(int argc, char *argv[]) {
 				scale_to_screen(screen_radius, laser_radius);
 				
 				printf("x:%f, y:%f, radius:%f\n", screen_x_center, screen_y_center, screen_radius);
-				if ( strcmp(arc->laser_on, "True") == 0)
-					al_draw_arc(screen_x_center, screen_y_center, screen_radius, start_theta, end_theta, al_map_rgb(0,0,0), 2);
+				if ( strcmp(arc->laser_on, "True") == 0) {
+					for (double i = start_theta*2*3.14159/180; i<end_theta*2*3.14159/180; i+=0.1) {
+						get_circle_point(screen_y_new, screen_x_new, screen_x_center, screen_y_center, screen_radius, i);
+					}
+					
+					al_draw_arc(screen_x_center, screen_y_center, screen_radius, start_theta*2*3.14159/180, end_theta*2*3.14159/180, al_map_rgb(0,0,0), 2);
+					
+				}
 					
 				/* copy across current position */
-				get_screen_coords(screen_x_old, screen_y_old, laser_x_new, laser_y_new);
+				get_circle_point(screen_y_new, screen_x_new, screen_x_center, screen_y_center, screen_radius, end_theta*2*3.14159/180);
 				laser_x_old = laser_x_new;
 				laser_y_old = laser_y_new;
 					
