@@ -58,7 +58,8 @@ void process_cmd_opts(int argc, char *argv[])
 	while ( (c=getopt(argc, argv, "o:")) != -1) {
 		switch (c) {
 		case 'o':
-			strncpy(optarg, optarg, sizeof(optarg));
+			printf("o\n");
+			strncpy(out_file, optarg, sizeof(out_file));
 			break;
 		case '?':
 			help();
@@ -478,6 +479,16 @@ int process_path(xmlNodePtr node){
 			path_string += path_get_double(path_string, bez_end.y);
 			
 			printf("bezier begins at %f %f\n", bez_start.x, bez_start.y);
+			/* if this is a relative bezier all given coordinates are relatives to current point. Shift to absolute */
+			if (command == m_relative) {
+				bez_inter1.x += bez_start.x;
+				bez_inter1.y += bez_start.y;
+				bez_inter2.x += bez_start.x;
+				bez_inter2.y += bez_start.y;
+				bez_end.x += bez_start.x;
+				bez_end.y += bez_start.y;
+			}
+			
 			printf("bezier ends at %f %f\n", bez_end.x, bez_end.y);
 			printf("iterating bezier. x:%f y:%f z:%f w:%f\n", bez_inter1.x, bez_inter1.y, bez_inter2.x, bez_inter2.y);
 			
@@ -486,10 +497,10 @@ int process_path(xmlNodePtr node){
 				/* get a new point along bezier curve */				
 				cubic_bezier_get_x_y(current_point, bez_start, bez_inter1, bez_inter2, bez_end, t);
 				
-				if (command == m_relative) {
+				/*if (command == m_relative) {
 					current_point.x+=last_point.x;
 					current_point.y+=last_point.y;
-				}
+				}*/
 				printf("pts: %f %f\n", current_point.x, current_point.y);
 				conv_point = shift_coordinate_file_to_macro(current_point);				
 				mw_line_populate(m_absolute, line, conv_point.x, conv_point.y, M_LASER_ON);
