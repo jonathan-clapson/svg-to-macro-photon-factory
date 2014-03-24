@@ -102,7 +102,6 @@ int main(int argc, char *argv[]) {
 	al_draw_filled_rectangle(0,0,left_border, screen_height, al_map_rgb(0,0,0));
 	al_draw_filled_rectangle(right_border, 0, screen_width, screen_height, al_map_rgb(0,0,0));
 	
-	
 	//gnuplot_ctrl *gnu_plot = gnuplot_init();	
 	mr_init(argv[1]);
 	
@@ -128,7 +127,7 @@ int main(int argc, char *argv[]) {
 				laser_x_new = atof(line->x);
 				laser_y_new = atof(line->y);
 				get_screen_coords(screen_x_new, screen_y_new, laser_x_new, laser_y_new);
-				printf("drawing from (%f,%f) to (%f,%f)\n", screen_x_old, screen_y_old, screen_x_new, screen_y_new);
+				//printf("drawing from (%f,%f) to (%f,%f)\n", screen_x_old, screen_y_old, screen_x_new, screen_y_new);
 				if (atof(line->spacing) != 0.0)
 					al_draw_line(screen_x_old, screen_y_old, screen_x_old+screen_x_new, screen_y_old+screen_y_new, al_map_rgb(0,0,0), 2);
 					
@@ -144,7 +143,7 @@ int main(int argc, char *argv[]) {
 				laser_x_new = atof(line->x);
 				laser_y_new = atof(line->y);
 				get_screen_coords(screen_x_new, screen_y_new, laser_x_new, laser_y_new);
-				printf("drawing from (%f,%f) to (%f,%f)\n", screen_x_old, screen_y_old, screen_x_new, screen_y_new);
+				//printf("drawing from (%f,%f) to (%f,%f)\n", screen_x_old, screen_y_old, screen_x_new, screen_y_new);
 				if (atof(line->spacing) != 0.0)
 					al_draw_line(screen_x_old, screen_y_old, screen_x_new, screen_y_new, al_map_rgb(0,0,0), 2);
 					
@@ -160,7 +159,7 @@ int main(int argc, char *argv[]) {
 				laser_x_new = atof(line->x);
 				laser_y_new = atof(line->y);
 				get_screen_coords(screen_x_new, screen_y_new, laser_x_new, laser_y_new);
-				printf("drawing from (%f,%f) to (%f,%f)\n", screen_x_old, screen_y_old, screen_x_new, screen_y_new);
+				//printf("drawing from (%f,%f) to (%f,%f)\n", screen_x_old, screen_y_old, screen_x_new, screen_y_new);
 				if (atof(line->spacing) != 0.0)
 					al_draw_line(screen_x_old, screen_y_old, screen_x_new, screen_y_new, al_map_rgb(0,0,0), 2);
 				
@@ -183,13 +182,13 @@ int main(int argc, char *argv[]) {
 				/* x^2 + y^2 = r^2
 				 * r is known x and y are unknown
 				 */
-				printf("edge at %f,%f\n", laser_x_old, laser_y_old);
-				printf("radx: %f, rady%f\n", laser_radius*cos(start_theta), laser_radius*sin(start_theta));
+				//printf("edge at %f,%f\n", laser_x_old, laser_y_old);
+				//printf("radx: %f, rady%f\n", laser_radius*cos(start_theta), laser_radius*sin(start_theta));
 				
 				laser_x_rad_offs = laser_radius * cos(start_theta);
 				laser_y_rad_offs = laser_radius * sin(start_theta);				
 				
-				printf("center shift by %f,%f\n", laser_x_rad_offs, laser_y_rad_offs);
+				//printf("center shift by %f,%f\n", laser_x_rad_offs, laser_y_rad_offs);
 				
 				laser_x_center = laser_x_old - laser_x_rad_offs;
 				laser_y_center = laser_y_old - laser_y_rad_offs;
@@ -199,8 +198,8 @@ int main(int argc, char *argv[]) {
 				
 				get_screen_coords(screen_x_center, screen_y_center, laser_x_center, laser_y_center);
 				scale_to_screen(screen_radius, laser_radius);
-				
-				printf("x:%f, y:%f, radius:%f\n", screen_x_center, screen_y_center, screen_radius);
+				//printf("lx:%f, ly:%f, lrad:%f\n", laser_x_center, laser_y_center, laser_radius);
+				//printf("x:%f, y:%f, radius:%f\n", screen_x_center, screen_y_center, screen_radius);
 				if ( strcmp(arc->laser_on, "True") == 0) {
 					for (double i = start_theta*2*3.14159/180; i<end_theta*2*3.14159/180; i+=0.1) {
 						get_circle_point(screen_y_new, screen_x_new, screen_x_center, screen_y_center, screen_radius, i);
