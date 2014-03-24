@@ -13,7 +13,7 @@ int mr_arc_read();
 int mr_zero_counter(char counter);
 int mr_comment(const char *format, ...);
 
-int mr_read(mr_inst_ptr ptr, enum m_commands_t &command_type);
+int mr_read(mr_inst_ptr &ptr, enum m_commands_t &command_type);
 void mr_free(mr_inst_ptr ptr);
 
 int mr_init(const char *file_name);

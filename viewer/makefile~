@@ -1,0 +1,10 @@
+CC 		= g++
+CFLAGS 	= -O3
+RM		= rm -f
+
+CPP_FILES=gnuplot_i.cpp main.cpp shape_math.cpp
+HDR_FILES=gnuplot_i.h shape_math.h
+
+viewer: $(CPP_FILES) $(HDR_FILES)
+	$(CC) $(CFLAGS) -o viewer $(CPP_FILES)
+
