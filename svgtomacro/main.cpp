@@ -163,8 +163,9 @@ void shift_coordinate_file_to_macro(double &x, double &y)
 	y *= 1000;	
 }
 
-void shift_coordinate_file_to_macro(point_t &point)
+point_t shift_coordinate_file_to_macro(point_t point)
 {
+	
 	/* shift coordinates */
 	point.x -= 100000;
 	point.y -= 75000;	
@@ -172,6 +173,8 @@ void shift_coordinate_file_to_macro(point_t &point)
 	/* change from um to nm */
 	point.x *= 1000;
 	point.y *= 1000;	
+	
+	return point;
 }
 
 
@@ -217,6 +220,7 @@ int process_line(xmlNodePtr node){
 int process_ellipse(xmlNodePtr node){
 	point_t start_point = {0.0, 0.0}; /* keeps track of the point to close to - this should probably be a list I think you can do subpaths within subpaths? :S */
 	point_t current_point = {0.0, 0.0};
+	point_t conv_point = {0.0, 0.0};
 	
 	double fill = 0;
 	struct m_line_t line;
@@ -235,7 +239,7 @@ int process_ellipse(xmlNodePtr node){
 	
 	/* get start point */
 	ellipse_get_x_y(current_point, center, radii, 0.00);
-	shift_coordinate_file_to_macro(current_point);
+	current_point = shift_coordinate_file_to_macro(current_point);
 	
 	mw_line_populate(m_absolute, line, current_point.x, current_point.y, M_LASER_OFF);
 	mw_line_exec(line);
@@ -246,9 +250,9 @@ int process_ellipse(xmlNodePtr node){
 		/* get a new point along ellipse */
 		ellipse_get_x_y(current_point, center, radii, t);
 		
-		shift_coordinate_file_to_macro(current_point);		
+		conv_point = shift_coordinate_file_to_macro(current_point);		
 		
-		mw_line_populate(m_absolute, line, current_point.x, current_point.y, M_LASER_ON);
+		mw_line_populate(m_absolute, line, conv_point.x, conv_point.y, M_LASER_ON);
 		mw_line_exec(line);
 	}		
 	
@@ -384,6 +388,7 @@ int process_path(xmlNodePtr node){
 	/* position tracking */
 	point_t start_point = {0.0, 0.0}; /* keeps track of the point to close to - this should probably be a list I think you can do subpaths within subpaths? :S */
 	point_t current_point = {0.0, 0.0}, last_point = {0.0, 0.0};
+	point_t conv_point = {0.0, 0.0}; /* used to convert to macrowriter coordinates before pushing out */
 	/* bezier variables */
 	point_t bez_start, bez_inter1, bez_inter2, bez_end;
 	
@@ -401,15 +406,20 @@ int process_path(xmlNodePtr node){
 	
 	mw_comment("PATH: %s", id);
 	printf("processing path %s\n", id);
+	enum m_commands_t command = m_command_invalid;
+	
+	struct m_line_t line;
 		
 	/* process the path string */
 	while(*path_string) {
 		switch(*path_string) {
 		case 'M': 
-		case 'm': /* moveto */	
-			if (path_string == first_char) {
+		case 'm': /* moveto */
+			if ( (*path_string == 'M') || (path_string == first_char) )
+				command = m_absolute;
+			else 
+				command = m_relative;
 				
-			}
 			path_string++;
 			/* copy current point to last point */
 			memcpy(&last_point, &current_point, sizeof(last_point));
@@ -420,14 +430,21 @@ int process_path(xmlNodePtr node){
 			printf("moveto: %f %f\n", current_point.x, current_point.y);
 			
 			memcpy(&start_point, &current_point, sizeof(start_point));
+			printf("start point: %f %f\n", start_point.x, start_point.y);
 			
-			struct m_line_t line;
-			mw_line_populate(m_absolute, line, current_point.x, current_point.y, M_LASER_OFF);
+			conv_point = shift_coordinate_file_to_macro(current_point);				
+			mw_line_populate(m_relative, line, conv_point.x, conv_point.y, M_LASER_OFF);
 			mw_line_exec(line);
 
 			break;
-			
+		
+		case 'L': 
 		case 'l': /* draw line to */
+			if (*path_string == 'L')
+				command = m_absolute;
+			else
+				command = m_relative;
+			
 			path_string++;
 			/* copy current point to last point */
 			memcpy(&last_point, &current_point, sizeof(last_point));					
@@ -435,11 +452,18 @@ int process_path(xmlNodePtr node){
 			/* update current point */
 			path_string += path_get_double(path_string, current_point.x);
 			path_string += path_get_double(path_string, current_point.y);
+			printf("lineto: %f %f\n", current_point.x, current_point.y);
 			
-			mw_svgedit_helper_draw_line(last_point.x, last_point.y, current_point.x, current_point.y);
+			conv_point = shift_coordinate_file_to_macro(current_point);							
+			mw_line_populate(command, line, conv_point.x, conv_point.y, M_LASER_ON);
+			mw_line_exec(line);			
 			break;
-			
+		case 'C':	
 		case 'c': /* curve to. This is a cubic bezier curve */
+			if (*path_string == 'C')
+				command = m_absolute;
+			else
+				command = m_relative;
 			path_string++;
 			/* copy current point to last point */
 			memcpy(&last_point, &current_point, sizeof(last_point));
@@ -453,18 +477,26 @@ int process_path(xmlNodePtr node){
 			path_string += path_get_double(path_string, bez_end.x);
 			path_string += path_get_double(path_string, bez_end.y);
 			
-			printf("iterating bezier. x:%f y:%f z:%f w:%f xend:%f yend:%f\n", bez_inter1.x, bez_inter1.y, bez_inter2.x, bez_inter2.y, bez_end.x, bez_end.y);
+			printf("bezier begins at %f %f\n", bez_start.x, bez_start.y);
+			printf("bezier ends at %f %f\n", bez_end.x, bez_end.y);
+			printf("iterating bezier. x:%f y:%f z:%f w:%f\n", bez_inter1.x, bez_inter1.y, bez_inter2.x, bez_inter2.y);
 			
 			/* fit line segments to bezier */				
 			for (double t = 0.00; t <= 1.00; t+=0.01) {
-				/* get a new point along bezier curve */
+				/* get a new point along bezier curve */				
 				cubic_bezier_get_x_y(current_point, bez_start, bez_inter1, bez_inter2, bez_end, t);
 				
-				mw_svgedit_helper_draw_line(last_point.x, last_point.y, current_point.x, current_point.y);
-				
-				/* update position along bezier curve */
-				memcpy(&last_point, &current_point, sizeof(last_point));
-			}		
+				if (command == m_relative) {
+					current_point.x+=last_point.x;
+					current_point.y+=last_point.y;
+				}
+				printf("pts: %f %f\n", current_point.x, current_point.y);
+				conv_point = shift_coordinate_file_to_macro(current_point);				
+				mw_line_populate(m_absolute, line, conv_point.x, conv_point.y, M_LASER_ON);
+				mw_line_exec(line);
+			}
+			/* update position to end of bezier curve */
+			memcpy(&last_point, &current_point, sizeof(last_point));	
 			break;
 			
 		case 'z': case 'Z': /* draw line back to start point */
@@ -473,9 +505,11 @@ int process_path(xmlNodePtr node){
 			memcpy(&last_point, &current_point, sizeof(last_point));
 			/* copy closing point to current point */
 			memcpy(&current_point, &start_point, sizeof(last_point));
-		
-			mw_svgedit_helper_draw_line(last_point.x, last_point.y, current_point.x, current_point.y);			
+			printf("closing line s:%f %f, e:%f %f\n", last_point.x, last_point.y, start_point.x, start_point.y);
 			
+			conv_point = shift_coordinate_file_to_macro(current_point);				
+			mw_line_populate(m_absolute, line, conv_point.x, conv_point.y, M_LASER_ON);			
+			mw_line_exec(line);
 			break;
 		default: /* unexpected or unaccounted for */
 			/* currently havent deal with Capitol (absolute) versions */
