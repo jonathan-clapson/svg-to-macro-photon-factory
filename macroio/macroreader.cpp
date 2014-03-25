@@ -115,7 +115,7 @@ char* mr_get_command(char *line, enum m_commands_t &command){
 	}
 	
 	if (command == -1) {
-		printf("MR_ERROR: cannot find command in line %s\n", line);
+		fprintf(stderr, "MR_ERROR: cannot find command in line %s\n", line);
 	}
 	
 	//move line pointer past command
@@ -155,19 +155,19 @@ int mr_read(mr_inst_ptr &inst_ptr, enum m_commands_t &command_type) {
 	//fflush(stdout);
 	switch(command_type) {
 		case m_arc: /* ArcMove */
-			printf("arc\n");
+			fprintf(stderr, "arc\n");
 			arc_ptr = (m_arc_t *) malloc(sizeof(m_arc_t));
 			mr_read_arc_params(arc_ptr, line);			
 			inst_ptr = (mr_inst_ptr) arc_ptr;
 			break;		
 		case m_origin: /* Origin Move */
-			printf("origin\n");
+			fprintf(stderr, "origin\n");
 			line_ptr = (m_line_t *) malloc(sizeof(m_line_t));
 			mr_read_line_params(line_ptr, line);	
 			inst_ptr = (mr_inst_ptr) line_ptr;	
 			break;
 		case m_relative: /* Relative Move */
-			printf("rel\n");
+			fprintf(stderr, "rel\n");
 			line_ptr = (m_line_t *) malloc(sizeof(m_line_t));
 			mr_read_line_params(line_ptr, line);
 			//printf("lineax: %s\n",  line_ptr->x);
@@ -175,7 +175,7 @@ int mr_read(mr_inst_ptr &inst_ptr, enum m_commands_t &command_type) {
 			//printf("instptr ax: %s\n", ((m_line_t *)inst_ptr)->x);
 			break;
 		case m_absolute: /* Absolute Move */
-			printf("abs\n");
+			fprintf(stderr, "abs\n");
 			line_ptr = (m_line_t *) malloc(sizeof(m_line_t));
 			mr_read_line_params(line_ptr, line);
 			inst_ptr = (mr_inst_ptr) line_ptr;				
