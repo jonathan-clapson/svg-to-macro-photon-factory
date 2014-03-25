@@ -441,8 +441,6 @@ int mw_beam_align_exec(m_beam_align_t& beam_align)
 {
 	if (!fp)
 		return M_ERR_FILE_NOT_OPEN;
-		
-	fputs("BeamAlignerControl", fp);
 	
 	/* axes start from x=1 */
 	fprintf(fp, "BeamAlignerControl;%s;%s"LINE_END, 
