@@ -1,4 +1,6 @@
 testsvg
+testfiles-22nd
 macros
 convert
 *.mac
+*.o
