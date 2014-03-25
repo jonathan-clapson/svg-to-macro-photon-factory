@@ -83,6 +83,23 @@ struct m_line_t {
 	char wait[M_BUF_LEN];	
 };
 
+/* holds beam alignment converted to character arrays */
+struct m_beam_align_t {
+	char one[M_BUF_LEN];
+	char command[M_BUF_LEN];
+	char value[M_BUF_LEN];
+};
+/* defines the beam alignment commands */
+enum beam_align_commands_t {
+	mw_beam_new_locale = 0,
+	mw_beam_switch_cam
+};
+/* defines the beam alignment parameters */
+enum beam_align_values_t {
+	mw_beam_cam = 0,
+	mw_inspectioncam
+};
+
 /* type for holding homing and zero instructions */
 struct m_home_zero_t {
 	union {

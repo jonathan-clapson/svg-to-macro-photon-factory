@@ -17,6 +17,10 @@ int mw_arc_init(struct m_arc_t &arc);
 int mw_arc_populate(struct m_arc_t &arc, long radius, double start_angle, double end_angle, unsigned laser_on);
 int mw_arc_exec(struct m_arc_t arc);
 
+int mw_beam_align_exec(m_beam_align_t& beam_align);
+int mw_beam_align_populate(struct m_beam_align_t &beam_align, enum beam_align_commands_t& command, enum beam_align_values_t &value);
+int mw_beam_align_init(m_beam_align_t& beam_align);
+
 int mw_zero_counters_init(m_zero_t& zero);
 int mw_zero_counters_populate(m_zero_t& zero, int n_args, ...);
 int mw_zero_counters_exec(m_zero_t& zero);

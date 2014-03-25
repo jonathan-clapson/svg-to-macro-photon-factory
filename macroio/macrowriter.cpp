@@ -129,7 +129,7 @@ int mw_arc_init(struct m_arc_t &arc) {
  *
  * @param[in]	home a home structure to initialise
  * 
- * @return returns 0 on success, -1 on file not open
+ * @return returns 0
  */
 int mw_home_stage_init(m_home_t& home)
 {
@@ -142,11 +142,24 @@ int mw_home_stage_init(m_home_t& home)
  *
  * @param[in]	home a home structure to initialise
  * 
- * @return returns 0 on success, -1 on file not open
+ * @return returns 0 
  */
 int mw_zero_counters_init(m_zero_t& zero)
 {
 	return mw_home_stage_init(zero);
+}
+
+/**
+ * Initialises a beam align structure
+ *
+ * @param[in]	beam a beam structure to initialise
+ * 
+ * @return returns 0 
+ */
+int mw_beam_align_init(m_beam_align_t& beam_align)
+{
+	memset(&beam_align, 0, sizeof(m_beam_align_t));
+	return M_ERR_SUCCESS;
 }
 
 /**
@@ -231,6 +244,23 @@ int mw_arc_populate(struct m_arc_t &arc, long radius, double start_angle, double
 		strncpy(arc.repeat_rate, "500", M_BUF_LEN);
 	}
 	
+	return M_ERR_SUCCESS;
+}
+
+/** 
+ * constructs an arc structure with parameters
+ * 
+ * @param[in] beam_align reference to an m_beam_align_t to initialise and fill in
+ * @param[in] command the command to send
+ * @param[in] value the value to use as parameter for command
+ * 
+ * @return returns 0
+ */
+int mw_beam_align_populate(struct m_beam_align_t &beam_align, enum beam_align_commands_t& command, enum beam_align_values_t &value)
+{
+	mw_beam_align_init(beam_align);
+	(command == mw_beam_new_locale) ? strcpy(beam_align.command, "1") : strcpy(beam_align.command, "0");
+	(value == mw_beam_cam) ? strcpy(beam_align.value, "1") : strcpy(beam_align.value, "0");
 	return M_ERR_SUCCESS;
 }
 
@@ -401,26 +431,27 @@ int mw_line_exec(struct m_line_t line)
 }
 
 /**
- * Writes an instruction to zero the x or y counter
+ * Writes an instruction to switch stage positions or to switch cameras
  *
- * @param[in]	counter the counter to write to ('x' or 'y')
+ * @param[in]	beam_align a m_beam_align_t containing a command and value 
  * 
- * @return returns 0 on success, -1 on file not open
+ * @return returns M_ERR_SUCCESS on success, M_ERR_FILE_NOT_OPEN on file not open
  */
-int mw_zero_counter(char counter)
+int mw_beam_align_exec(m_beam_align_t& beam_align)
 {
 	if (!fp)
 		return M_ERR_FILE_NOT_OPEN;
-	
-	if (counter != 1 && counter != 2) {
-		return M_ERR_ARG_INVALID;
-	}
 		
-	fprintf(fp, "ZeroCounters;%1d"LINE_END,  (counter == 'x') ? '1' : '2');	
-	return M_ERR_SUCCESS;
+	fputs("BeamAlignerControl", fp);
+	
+	/* axes start from x=1 */
+	fprintf(fp, "BeamAlignerControl;%s;%s"LINE_END, 
+		beam_align.command,
+		beam_align.value
+	);	
+	
+	return M_ERR_SUCCESS;	
 }
-
-
 
 /**
  * Writes an instruction to home axes
