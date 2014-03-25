@@ -129,10 +129,12 @@ char* mr_get_command(char *line, enum m_commands_t &command){
 int mr_read(mr_inst_ptr &inst_ptr, enum m_commands_t &command_type) {
 	/* well this is what i wanted to do, but i couldn't figure out how to get it to do it
 	 * char line[MR_READ_LEN];
-	 * so instead we allocate memory then free it...
+	 * so instead we allocate memory then free it, probably the better way to do it anyway, but looks scarier to newcomers.
 	 */
 	char *line_memory = (char *) malloc(MR_READ_LEN);
 	char *line = line_memory; /* get a copy of line_memory that we can muck round with */
+	
+	/* clear the instruction pointer incase we don't return data */
 	inst_ptr = NULL;
 	
 	m_arc_t* arc_ptr = NULL;

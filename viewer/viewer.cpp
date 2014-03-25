@@ -127,6 +127,7 @@ int main(int argc, char *argv[]) {
 		enum m_commands_t command_type;
 		read_ret = mr_read(instruction, command_type);
 		if (instruction != NULL) {
+			printf("command_type: %s\n", command_type);
 			if (command_type == m_relative) {
 				m_line_t *line = (m_line_t *) instruction;
 				laser_x_new = atof(line->x);
