@@ -259,8 +259,8 @@ int mw_arc_populate(struct m_arc_t &arc, long radius, double start_angle, double
 int mw_beam_align_populate(struct m_beam_align_t &beam_align, enum beam_align_commands_t& command, enum beam_align_values_t &value)
 {
 	mw_beam_align_init(beam_align);
-	(command == mw_beam_new_locale) ? strcpy(beam_align.command, "1") : strcpy(beam_align.command, "0");
-	(value == mw_beam_cam) ? strcpy(beam_align.value, "1") : strcpy(beam_align.value, "0");
+	(command == m_beam_new_locale) ? strcpy(beam_align.command, "1") : strcpy(beam_align.command, "0");
+	(value == m_beam_cam) ? strcpy(beam_align.value, "1") : strcpy(beam_align.value, "0");
 	return M_ERR_SUCCESS;
 }
 
