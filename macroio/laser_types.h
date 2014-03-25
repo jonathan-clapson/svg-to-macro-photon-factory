@@ -90,12 +90,12 @@ struct m_beam_align_t {
 	char value[M_BUF_LEN];
 };
 /* defines the beam alignment commands */
-enum beam_align_commands_t {
+enum m_beam_align_commands_t {
 	m_beam_new_locale = 0,
 	m_beam_switch_cam
 };
 /* defines the beam alignment parameters */
-enum beam_align_values_t {
+enum m_beam_align_values_t {
 	m_beam_cam = 0,
 	m_inspectioncam
 };

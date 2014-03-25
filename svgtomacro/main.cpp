@@ -153,24 +153,42 @@ xmlXPathObjectPtr get_layers(xmlDocPtr doc){
 	return get_node_set(doc, (xmlChar *)"/svg:svg/svg:g", (xmlChar *)"http://www.w3.org/2000/svg");
 }
 
-void shift_coordinate_file_to_macro(double &x, double &y)
+const double page_width = 200000;
+const double page_height = 150000;
+void shift_coordinate_file_abs_to_macro(double &x, double &y)
 {
 	/* shift coordinates */
-	x -= 100000;
-	y -= 75000;	
+	x -= page_width/2;
+	y -= page_height/2;	
 		
 	/* change from um to nm */
 	x *= 1000;
 	y *= 1000;	
 }
 
-point_t shift_coordinate_file_to_macro(point_t point)
+point_t shift_coordinate_file_abs_to_macro(point_t point)
 {
 	
 	/* shift coordinates */
-	point.x -= 100000;
-	point.y -= 75000;	
+	point.x -= page_width/2;
+	point.y -= page_height/2;	
 		
+	/* change from um to nm */
+	point.x *= 1000;
+	point.y *= 1000;	
+	
+	return point;
+}
+
+void shift_coordinate_file_rel_to_macro(double &x, double &y)
+{		
+	/* change from um to nm */
+	x *= 1000;
+	y *= 1000;	
+}
+
+point_t shift_coordinate_file_rel_to_macro(point_t point)
+{
 	/* change from um to nm */
 	point.x *= 1000;
 	point.y *= 1000;	
@@ -240,7 +258,7 @@ int process_ellipse(xmlNodePtr node){
 	
 	/* get start point */
 	ellipse_get_x_y(current_point, center, radii, 0.00);
-	current_point = shift_coordinate_file_to_macro(current_point);
+	current_point = shift_coordinate_file_abs_to_macro(current_point);
 	
 	mw_line_populate(m_absolute, line, current_point.x, current_point.y, M_LASER_OFF);
 	mw_line_exec(line);
@@ -251,7 +269,7 @@ int process_ellipse(xmlNodePtr node){
 		/* get a new point along ellipse */
 		ellipse_get_x_y(current_point, center, radii, t);
 		
-		conv_point = shift_coordinate_file_to_macro(current_point);		
+		conv_point = shift_coordinate_file_abs_to_macro(current_point);		
 		
 		mw_line_populate(m_absolute, line, conv_point.x, conv_point.y, M_LASER_ON);
 		mw_line_exec(line);
@@ -433,7 +451,12 @@ int process_path(xmlNodePtr node){
 			memcpy(&start_point, &current_point, sizeof(start_point));
 			printf("start point: %f %f\n", start_point.x, start_point.y);
 			
-			conv_point = shift_coordinate_file_to_macro(current_point);				
+			if (command == m_absolute) {
+				conv_point = shift_coordinate_file_abs_to_macro(current_point);	
+			} else {
+				conv_point = shift_coordinate_file_rel_to_macro(current_point);
+			}
+				
 			mw_line_populate(m_relative, line, conv_point.x, conv_point.y, M_LASER_OFF);
 			mw_line_exec(line);
 
@@ -455,7 +478,13 @@ int process_path(xmlNodePtr node){
 			path_string += path_get_double(path_string, current_point.y);
 			printf("lineto: %f %f\n", current_point.x, current_point.y);
 			
-			conv_point = shift_coordinate_file_to_macro(current_point);							
+			if (command == m_absolute) {
+				conv_point = shift_coordinate_file_abs_to_macro(current_point);	
+			} else {
+				conv_point = shift_coordinate_file_rel_to_macro(current_point);
+			}
+				
+			printf("shift lineto: %f %f\n", conv_point.x, conv_point.y);						
 			mw_line_populate(command, line, conv_point.x, conv_point.y, M_LASER_ON);
 			mw_line_exec(line);			
 			break;
@@ -502,7 +531,7 @@ int process_path(xmlNodePtr node){
 					current_point.y+=last_point.y;
 				}*/
 				printf("pts: %f %f\n", current_point.x, current_point.y);
-				conv_point = shift_coordinate_file_to_macro(current_point);				
+				conv_point = shift_coordinate_file_abs_to_macro(current_point);				
 				mw_line_populate(m_absolute, line, conv_point.x, conv_point.y, M_LASER_ON);
 				mw_line_exec(line);
 			}
@@ -518,7 +547,7 @@ int process_path(xmlNodePtr node){
 			memcpy(&current_point, &start_point, sizeof(last_point));
 			printf("closing line s:%f %f, e:%f %f\n", last_point.x, last_point.y, start_point.x, start_point.y);
 			
-			conv_point = shift_coordinate_file_to_macro(current_point);				
+			conv_point = shift_coordinate_file_abs_to_macro(current_point);				
 			mw_line_populate(m_absolute, line, conv_point.x, conv_point.y, M_LASER_ON);			
 			mw_line_exec(line);
 			break;
@@ -569,6 +598,14 @@ int main (int argc, char *argv[])
 	mw_line_init(line);
 	mw_line_populate(m_relative, line, -31718800, -1414600, M_LASER_OFF);
 	mw_line_exec(line);
+	
+	/*
+	 * align beam with laser rather than camera 
+	 */
+	m_beam_align_t beam_align;
+	mw_beam_align_init(beam_align);
+	mw_beam_align_populate(beam_align, m_beam_new_locale, m_beam_cam);
+	mw_beam_align_exec(beam_align);
 	
 	/*
 	 * set abs and origin coordinates ?what is the difference between abs and origin? :S 
