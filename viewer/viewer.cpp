@@ -61,6 +61,11 @@ void get_screen_coords(double &screen_x, double &screen_y, double laser_x, doubl
 	screen_y = laser_y / scale_factor;
 	screen_y += y_shift;
 }
+void get_screen_offset(double &screen_x, double &screen_y, double laser_x, double laser_y)
+{
+	screen_x = laser_x / scale_factor;
+	screen_y = laser_y / scale_factor;
+}
 void scale_to_screen(double &screen_radius, double laser_radius)
 {
 	screen_radius = laser_radius/scale_factor;
@@ -126,10 +131,14 @@ int main(int argc, char *argv[]) {
 				m_line_t *line = (m_line_t *) instruction;
 				laser_x_new = atof(line->x);
 				laser_y_new = atof(line->y);
-				get_screen_coords(screen_x_new, screen_y_new, laser_x_new, laser_y_new);
-				//printf("drawing from (%f,%f) to (%f,%f)\n", screen_x_old, screen_y_old, screen_x_new, screen_y_new);
-				if (atof(line->spacing) != 0.0)
+				get_screen_offset(screen_x_new, screen_y_new, laser_x_new, laser_y_new);
+				
+				if (atof(line->spacing) != 0.0) {
 					al_draw_line(screen_x_old, screen_y_old, screen_x_old+screen_x_new, screen_y_old+screen_y_new, al_map_rgb(0,0,0), 2);
+					printf("drawing from (%f,%f) to (%f,%f)\n", laser_x_old, laser_y_old, laser_x_new+laser_x_old, laser_y_new+laser_y_old);
+					printf("drawing from (%f,%f) to (%f,%f)\n", screen_x_old, screen_y_old, screen_x_old+screen_x_new, screen_y_old+screen_y_new);
+					
+				}
 					
 				/* copy across current position */
 				screen_x_old = screen_x_new;
