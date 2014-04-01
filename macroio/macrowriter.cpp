@@ -1,6 +1,7 @@
 #include <stdarg.h>
 #include <cstring>
 #include <cstdio>
+#include <cstdlib>
 
 #include "macrowriter.h"
 #include "macroerror.h"
@@ -12,8 +13,8 @@ char *name;
 #define LINE_END "\r\n"
 
 /* counters for checking if inputs are out of bounds */
-int mw_current_pos_x = 0;
-int mw_current_pos_y = 0;
+float mw_current_pos_x = 0;
+float mw_current_pos_y = 0;
 
 /* FIXME: the following two helper functions shouldn't be doing coordinate converstion */
 
@@ -28,10 +29,10 @@ int mw_svgedit_helper_draw_line(int x0, int y0, int x1, int y1)
 	 * svgedit uses coordinates with (0,0) being top left as defined in svg spec 
 	 * laser uses coordinates with (0,0) being the center of the stage 
 	 */
-	x0 -= mw_paper_half_width;
-	y0 -= mw_paper_half_height;
-	x1 -= mw_paper_half_width;
-	y1 -= mw_paper_half_height;
+	x0 -= mw_paper_half_width_um;
+	y0 -= mw_paper_half_height_um;
+	x1 -= mw_paper_half_width_um;
+	y1 -= mw_paper_half_height_um;
 	
 	/* 
 	 * svgedit uses 1 unit = 1 micrometer. 
@@ -58,8 +59,8 @@ int mw_svgedit_helper_draw_circle(long radius, long x, long y)
 	 * svgedit uses coordinates with (0,0) being top left as defined in svg spec 
 	 * laser uses coordinates with (0,0) being the center of the stage 
 	 */	
-	x -= mw_paper_half_width;
-	y -= mw_paper_half_height;
+	x -= mw_paper_half_width_um;
+	y -= mw_paper_half_height_um;
 	
 	/* need to shift stage so we are cutting the line not the center */
 	x += radius;
@@ -419,27 +420,38 @@ int mw_line_exec(struct m_line_t line)
 	 */
 	int err = M_ERR_SUCCESS;
 	
-	 /* sanity checking */
-	if (line.coordinate_type == m_absolute || line.coordinate_type == m_origin)
-	if (mw_current_pos_x > (int) mw_paper_half_width) {
-		fprintf(stderr, "x is too large, clipping\n");
+	if (
+		strcmp(line.coordinate_type, m_move_commands_str[m_absolute]) == 0 || 
+		strcmp(line.coordinate_type, m_move_commands_str[m_origin]) == 0
+	) {
+	
+		mw_current_pos_x = atoi(line.x);
+		mw_current_pos_y = atoi(line.y);
+	} else if ( strcmp(line.coordinate_type, m_move_commands_str[m_relative]) == 0 ) {	
+		mw_current_pos_x += atoi(line.x);
+		mw_current_pos_y += atoi(line.y);
+	}
+	
+	/* sanity checking */	
+	if (mw_current_pos_x > mw_paper_half_width_nm) {
+		fprintf(stderr, "x (%f) is more than the page width (%f), clipping\n", mw_current_pos_x, mw_paper_half_width_nm);
 		err = M_ERR_X_OUT_OF_RANGE;
-		sprintf(line.x, "%d", mw_paper_half_width);
+		sprintf(line.x, "%d", mw_paper_half_width_nm);
 	}
-	if (mw_current_pos_x < (int) -mw_paper_half_width) {
-		fprintf(stderr, "x is too small, clipping\n");
+	if (mw_current_pos_x < -mw_paper_half_width_nm) {
+		fprintf(stderr, "x (%f) is less than the page width (%f), clipping\n", mw_current_pos_x, -mw_paper_half_width_nm);
 		err = M_ERR_X_OUT_OF_RANGE;
-		sprintf(line.x, "%d", -mw_paper_half_width);
+		sprintf(line.x, "%d", -mw_paper_half_width_nm);
 	}
-	if (mw_current_pos_y > (int) mw_paper_half_height) {
-		fprintf(stderr, "y is too large, clipping\n");
+	if (mw_current_pos_y > mw_paper_half_height_nm) {
+		fprintf(stderr, "x (%f) is more than the page width (%f), clipping\n", mw_current_pos_y, mw_paper_half_height_nm);
 		err = M_ERR_Y_OUT_OF_RANGE;
-		sprintf(line.y, "%d", mw_paper_half_height);
+		sprintf(line.y, "%d", mw_paper_half_height_nm);
 	}
-	if (mw_current_pos_y < (int) -mw_paper_half_height) {
-		fprintf(stderr, "y is too small, clipping\n");
+	if (mw_current_pos_y < -mw_paper_half_height_nm) {
+		fprintf(stderr, "x (%f) is less than the page width (%f), clipping\n", mw_current_pos_y, -mw_paper_half_height_nm);
 		err = M_ERR_Y_OUT_OF_RANGE;
-		sprintf(line.y, "%d", -mw_paper_half_height);
+		sprintf(line.y, "%d", -mw_paper_half_height_nm);
 	}
 	
 	fprintf(fp, "%s;%s;;%s;%s;%s;%s;%s;%s;%s;%s;%s"LINE_END,
@@ -455,6 +467,9 @@ int mw_line_exec(struct m_line_t line)
 		line.spacing,
 		line.wait
 	);
+	
+	if (err)
+		exit(1);
 	
 	return err;		
 }

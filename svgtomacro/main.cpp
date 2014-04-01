@@ -159,8 +159,8 @@ const double page_height = 130000;
 void shift_coordinate_file_abs_to_macro(double &x, double &y)
 {
 	/* shift coordinates */
-	x -= mw_paper_half_width;
-	y -= mw_paper_half_height;	
+	x -= mw_paper_half_width_um;
+	y -= mw_paper_half_height_um;	
 		
 	/* change from um to nm */
 	x *= 1000;
