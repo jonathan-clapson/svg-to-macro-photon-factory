@@ -7,4 +7,7 @@
 #define M_ERR_EOF -3
 #define M_ERR_NO_COMMAND -4
 
+#define M_ERR_X_OUT_OF_RANGE -5
+#define M_ERR_Y_OUT_OF_RANGE -6
+
 #endif /* __MACRO_ERROR_H__ */
