@@ -420,6 +420,7 @@ int mw_line_exec(struct m_line_t line)
 	int err = M_ERR_SUCCESS;
 	
 	 /* sanity checking */
+	if (line.coordinate_type == m_absolute || line.coordinate_type == m_origin)
 	if (mw_current_pos_x > (int) mw_paper_half_width) {
 		fprintf(stderr, "x is too large, clipping\n");
 		err = M_ERR_X_OUT_OF_RANGE;
@@ -433,12 +434,12 @@ int mw_line_exec(struct m_line_t line)
 	if (mw_current_pos_y > (int) mw_paper_half_height) {
 		fprintf(stderr, "y is too large, clipping\n");
 		err = M_ERR_Y_OUT_OF_RANGE;
-		sprintf(line.x, "%d", mw_paper_half_height);
+		sprintf(line.y, "%d", mw_paper_half_height);
 	}
 	if (mw_current_pos_y < (int) -mw_paper_half_height) {
 		fprintf(stderr, "y is too small, clipping\n");
 		err = M_ERR_Y_OUT_OF_RANGE;
-		sprintf(line.x, "%d", -mw_paper_half_height);
+		sprintf(line.y, "%d", -mw_paper_half_height);
 	}
 	
 	fprintf(fp, "%s;%s;;%s;%s;%s;%s;%s;%s;%s;%s;%s"LINE_END,
