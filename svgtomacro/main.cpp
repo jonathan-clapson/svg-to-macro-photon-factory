@@ -265,7 +265,7 @@ int process_ellipse(xmlNodePtr node){
 	mw_line_exec(line);
 	
 	/* fit line segments to ellipse */				
-	double step_size = 0.01;
+	double step_size = 0.1;
 	for (double t = 0.00+step_size; t <= 2*3.14159; t+=step_size) {		
 		/* get a new point along ellipse */
 		ellipse_get_x_y(current_point, center, radii, t);
@@ -525,7 +525,7 @@ int process_path(xmlNodePtr node){
 			printf("iterating bezier. x:%f y:%f z:%f w:%f\n", bez_inter1.x, bez_inter1.y, bez_inter2.x, bez_inter2.y);
 			
 			/* fit line segments to bezier */				
-			for (double t = 0.00; t <= 1.00; t+=0.01) {
+			for (double t = 0.00; t <= 1.00; t+=0.1) {
 				/* get a new point along bezier curve */				
 				cubic_bezier_get_x_y(current_point, bez_start, bez_inter1, bez_inter2, bez_end, t);
 				
