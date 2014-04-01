@@ -131,7 +131,7 @@ int mw_arc_init(struct m_arc_t &arc) {
 }
 
 /**
- * Initialises a home stage structure
+ * Initialises a home stage structure000) is less than the pag
  *
  * @param[in]	home a home structure to initialise
  * 
@@ -444,12 +444,12 @@ int mw_line_exec(struct m_line_t line)
 		sprintf(line.x, "%d", -mw_paper_half_width_nm);
 	}
 	if (mw_current_pos_y > mw_paper_half_height_nm) {
-		fprintf(stderr, "x (%f) is more than the page width (%f), clipping\n", mw_current_pos_y, mw_paper_half_height_nm);
+		fprintf(stderr, "y (%f) is more than the page width (%f), clipping\n", mw_current_pos_y, mw_paper_half_height_nm);
 		err = M_ERR_Y_OUT_OF_RANGE;
 		sprintf(line.y, "%d", mw_paper_half_height_nm);
 	}
 	if (mw_current_pos_y < -mw_paper_half_height_nm) {
-		fprintf(stderr, "x (%f) is less than the page width (%f), clipping\n", mw_current_pos_y, -mw_paper_half_height_nm);
+		fprintf(stderr, "y (%f) is less than the page width (%f), clipping\n", mw_current_pos_y, -mw_paper_half_height_nm);
 		err = M_ERR_Y_OUT_OF_RANGE;
 		sprintf(line.y, "%d", -mw_paper_half_height_nm);
 	}
@@ -467,9 +467,6 @@ int mw_line_exec(struct m_line_t line)
 		line.spacing,
 		line.wait
 	);
-	
-	if (err)
-		exit(1);
 	
 	return err;		
 }
