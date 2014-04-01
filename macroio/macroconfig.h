@@ -10,7 +10,7 @@
 const int mw_paper_width = 130000;
 const int mw_paper_height = 130000;
 
-const int mw_svg_to_paper_width = mw_paper_width/2;
-const int mw_svg_to_paper_height = mw_paper_width/2;
+const int mw_paper_half_width = mw_paper_width/2;
+const int mw_paper_half_height = mw_paper_width/2;
 
 #endif /* __MACRO_CONFIG_H__ */
