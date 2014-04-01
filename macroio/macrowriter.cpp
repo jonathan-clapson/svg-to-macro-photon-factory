@@ -4,6 +4,7 @@
 
 #include "macrowriter.h"
 #include "macroerror.h"
+#include "macroconfig.h"
 
 FILE *fp;
 char *name;
@@ -23,10 +24,10 @@ int mw_svgedit_helper_draw_line(int x0, int y0, int x1, int y1)
 	 * svgedit uses coordinates with (0,0) being top left as defined in svg spec 
 	 * laser uses coordinates with (0,0) being the center of the stage 
 	 */
-	x0 -= 100000;
-	y0 -= 75000;
-	x1 -= 100000;
-	y1 -= 75000;
+	x0 -= mw_svg_to_paper_width;
+	y0 -= mw_svg_to_paper_height;
+	x1 -= mw_svg_to_paper_width;
+	y1 -= mw_svg_to_paper_height;
 	
 	/* 
 	 * svgedit uses 1 unit = 1 micrometer. 
@@ -53,8 +54,8 @@ int mw_svgedit_helper_draw_circle(long radius, long x, long y)
 	 * svgedit uses coordinates with (0,0) being top left as defined in svg spec 
 	 * laser uses coordinates with (0,0) being the center of the stage 
 	 */	
-	x -= 100000;
-	y -= 100000;
+	x -= mw_svg_to_paper_width;
+	y -= mw_svg_to_paper_height;
 	
 	/* need to shift stage so we are cutting the line not the center */
 	x += radius;
