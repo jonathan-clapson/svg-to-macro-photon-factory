@@ -504,14 +504,20 @@ int process_path(xmlNodePtr node){
 			path_string += path_get_double(path_string, current_point.y);
 			printf("lineto: %f %f\n", current_point.x, current_point.y);
 			
-			if (command == m_absolute) {
+			if (command == m_relative) {
+				current_point.x += last_point.x;
+				current_point.y += last_point.y;
+			}
+			
+			/*if (command == m_absolute) {
 				conv_point = shift_coordinate_file_abs_to_macro(current_point);	
 			} else {
 				conv_point = shift_coordinate_file_rel_to_macro(current_point);
-			}
+			}*/
+			conv_point = shift_coordinate_file_abs_to_macro(current_point);	
 				
 			printf("shift lineto: %f %f\n", conv_point.x, conv_point.y);						
-			mw_line_populate(command, line, conv_point.x, conv_point.y, M_LASER_ON);			
+			mw_line_populate(m_absolute, line, conv_point.x, conv_point.y, M_LASER_ON);			
 			err = mw_line_exec(line);
 			if (err) {
 				fprintf(stderr, "err on element %c\n", (command == m_relative)?'l':'L');
