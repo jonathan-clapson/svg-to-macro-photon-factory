@@ -154,8 +154,6 @@ xmlXPathObjectPtr get_layers(xmlDocPtr doc){
 	return get_node_set(doc, (xmlChar *)"/svg:svg/svg:g", (xmlChar *)"http://www.w3.org/2000/svg");
 }
 
-const double page_width = 130000;
-const double page_height = 130000;
 void shift_coordinate_file_abs_to_macro(double &x, double &y)
 {
 	/* shift coordinates */
@@ -171,8 +169,8 @@ point_t shift_coordinate_file_abs_to_macro(point_t point)
 {
 	
 	/* shift coordinates */
-	point.x -= page_width/2;
-	point.y -= page_height/2;	
+	point.x -= mw_paper_half_width_um;
+	point.y -= mw_paper_half_height_um;	
 		
 	/* change from um to nm */
 	point.x *= 1000;
@@ -423,6 +421,7 @@ int process_path(xmlNodePtr node){
 	char *path_string = (char *) xmlGetProp(node, (xmlChar*)"d");
 	/* keep track of first char. If moveto is the first char (probably should always be), then it's an absolute irrespective of case */
 	char *first_char = path_string;
+	int err;
 	
 	mw_comment("PATH: %s", id);
 	printf("processing path %s\n", id);
@@ -441,28 +440,52 @@ int process_path(xmlNodePtr node){
 			} else {
 				command = m_relative;
 			}
+			
+			printf("moveto command: %s\n", m_move_commands_str[command]);
 				
 			path_string++;
 			/* copy current point to last point */
 			memcpy(&last_point, &current_point, sizeof(last_point));
+			printf("current abs point: %f %f\n", last_point.x, last_point.y);
 			
-			/* update current point */
+			/* update current point */			
 			path_string += path_get_double(path_string, current_point.x);
 			path_string += path_get_double(path_string, current_point.y);
-			printf("moveto: %f %f\n", current_point.x, current_point.y);
 			
+			if (command == m_relative) {
+				printf("relative move by: %f %f\n", current_point.x, current_point.y); 
+			} else {
+				printf("abs move to: %f %f\n", current_point.x, current_point.y);
+			}
+			
+				
+			
+			/* if its a relative move we need to shift current_point to the correct absolute coordinate */			
+			if (command == m_relative) {
+				current_point.x += last_point.x;
+				current_point.y += last_point.y;
+			}
 			memcpy(&start_point, &current_point, sizeof(start_point));
+			printf("current point: %f %f\n", current_point.x, current_point.y);
 			printf("start point: %f %f\n", start_point.x, start_point.y);
 			
-			if (command == m_absolute) {
+			/*if (command == m_absolute) {
 				conv_point = shift_coordinate_file_abs_to_macro(current_point);	
 			} else {
 				conv_point = shift_coordinate_file_rel_to_macro(current_point);
-			}
-				
-			mw_line_populate(command, line, conv_point.x, conv_point.y, M_LASER_OFF);
-			mw_line_exec(line);
+				printf("move offset: %f %f\n", current_point.x, current_point.y);
+				printf("move offset mac: %f %f\n", conv_point.x, conv_point.y);
+			}*/
 
+			conv_point = shift_coordinate_file_abs_to_macro(current_point);	
+			
+			mw_line_populate(m_absolute, line, conv_point.x, conv_point.y, M_LASER_OFF);
+			err = mw_line_exec(line);
+			if (err) {
+				fprintf(stderr, "err on element %c\n", (command == m_relative)?'m':'M');
+				exit(0);
+			}
+			
 			break;
 		
 		case 'L': 
@@ -488,9 +511,14 @@ int process_path(xmlNodePtr node){
 			}
 				
 			printf("shift lineto: %f %f\n", conv_point.x, conv_point.y);						
-			mw_line_populate(command, line, conv_point.x, conv_point.y, M_LASER_ON);
-			mw_line_exec(line);			
+			mw_line_populate(command, line, conv_point.x, conv_point.y, M_LASER_ON);			
+			err = mw_line_exec(line);
+			if (err) {
+				fprintf(stderr, "err on element %c\n", (command == m_relative)?'l':'L');
+				exit(0);
+			}			
 			break;
+			
 		case 'C':	
 		case 'c': /* curve to. This is a cubic bezier curve */
 			if (*path_string == 'C')
@@ -512,6 +540,11 @@ int process_path(xmlNodePtr node){
 			
 			printf("bezier begins at %f %f\n", bez_start.x, bez_start.y);
 			/* if this is a relative bezier all given coordinates are relatives to current point. Shift to absolute */
+			
+			if (command == m_absolute) {
+				fprintf(stderr, "svg-edit never output an absolute bezier for me. This is very likely broken");
+			}
+			
 			if (command == m_relative) {
 				bez_inter1.x += bez_start.x;
 				bez_inter1.y += bez_start.y;
@@ -535,8 +568,13 @@ int process_path(xmlNodePtr node){
 				}*/
 				printf("pts: %f %f\n", current_point.x, current_point.y);
 				conv_point = shift_coordinate_file_abs_to_macro(current_point);				
+				printf("ptsmac: %f %f\n", conv_point.x, conv_point.y);
 				mw_line_populate(m_absolute, line, conv_point.x, conv_point.y, M_LASER_ON);
-				mw_line_exec(line);
+				err = mw_line_exec(line);
+				if (err) {
+					fprintf(stderr, "err on element %c\n", (command == m_relative)?'c':'C');
+					exit(0);
+				}
 			}
 			/* update position to end of bezier curve */
 			memcpy(&last_point, &current_point, sizeof(last_point));	
@@ -552,7 +590,11 @@ int process_path(xmlNodePtr node){
 			
 			conv_point = shift_coordinate_file_abs_to_macro(current_point);				
 			mw_line_populate(m_absolute, line, conv_point.x, conv_point.y, M_LASER_ON);			
-			mw_line_exec(line);
+			err = mw_line_exec(line);
+			if (err) {
+				fprintf(stderr, "err on element %c\n", (command == m_relative)?'z':'Z');
+				exit(0);
+			}
 			break;
 		default: /* unexpected or unaccounted for */
 			/* currently havent deal with Capitol (absolute) versions */
