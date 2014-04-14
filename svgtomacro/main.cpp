@@ -151,7 +151,7 @@ double xml_get_double_param(xmlNodePtr node, xmlChar *property_name)
 xmlXPathObjectPtr get_layers(xmlDocPtr doc){
 	/* select all children of root node which have a title */
 	//return get_node_set(doc, (xmlChar *)"/svg:svg/svg:g");
-	return get_node_set(doc, (xmlChar *)"/svg:svg/svg:g", (xmlChar *)"http://www.w3.org/2000/svg");
+	return get_node_set(doc, (xmlChar *)"//svg:g", (xmlChar *)"http://www.w3.org/2000/svg");
 }
 
 void shift_coordinate_file_abs_to_macro(double &x, double &y)
