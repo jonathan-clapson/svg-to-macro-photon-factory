@@ -256,6 +256,7 @@ int process_ellipse(xmlNodePtr node){
 	fill = 	xml_get_double_param(node, (xmlChar*)"fill");
 	
 	/* get start point */
+
 	ellipse_get_x_y(current_point, center, radii, 0.00);
 	current_point = shift_coordinate_file_abs_to_macro(current_point);
 	
@@ -622,9 +623,17 @@ int main (int argc, char *argv[])
 	
 	process_cmd_opts(argc, argv);
 	
-	/* if outfile hasn't been given a name, set it to infile.mac */
-	if (*out_file == '\0')
-		sprintf(out_file, "%s.mac", in_file);
+	/* if outfile hasn't been given a name, set it to infile.mac without infiles extension */
+	if (*out_file == '\0') {
+		//find the start of the extension. this is done to the first '.' as the laser software can't cope with multiple '.' in file name...
+		int count = 0;
+		for (char *ptr = in_file; *ptr != '\0'; ptr++) {
+			if (*ptr == '.') break;
+			count++;
+		}
+		strncpy(out_file, in_file, count );
+		strcat(out_file, ".mac");
+	}
 		
 	printf("Using output file %s\n", out_file);
 	printf("Using input file %s\n", in_file);
